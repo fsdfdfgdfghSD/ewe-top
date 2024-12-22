@@ -1,0 +1,12 @@
+TODO: Make your task manager, keep it simple like `top', call it `etop' which stands for `ewe-table-of-processes'
+
+Need to display the following info:
+1. Name -> FINISHED
+2. Status -> FINISHED
+3. PID -> FINISHED!
+4. CPU
+5. Memory
+6. Disk
+7. Network
+
+8. Power Usage (Super Low, Low, Moderate, High, Super High) -> with colors, use ncurses
