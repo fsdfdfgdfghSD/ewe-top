@@ -8,6 +8,7 @@ ui_dir = $(include_dir)/ui
 
 # List of *.c files to compile
 error = $(include_dir)/error.c
+top = $(include_dir)/top.c
 ui = $(ui_dir)/ui.c
 
 # Outputing files
@@ -18,7 +19,7 @@ out_main = $(build_dir)/main
 all: run
 
 run:
-	gcc -Iinclude $(main) $(error) -o $(out_main) -lprocps -lncurses
+	gcc -Iinclude $(main) $(error) $(top) -o $(out_main) -lprocps -lncurses
 	$(out_main)
 
 clean:

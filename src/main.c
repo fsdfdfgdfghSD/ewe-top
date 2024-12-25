@@ -1,35 +1,23 @@
 #include <stdio.h>
-#include "main.h"
+#include "include/top.h"
 
 int main(void)
 {
-    PROCTAB *proc = openproc(PROC_FLAGS);
-    if (proc == NULL)
-        eputs("openproc");
+    PROCTAB *proc = safe_create__proc();
+    process_t *process = safe_create__process_struct(proc);
 
-    process_t *process = malloc(sizeof(process_t));
-    if (process == NULL)
-        eputs("malloc");
+    char *data = read__proc(proc, process);
+    if (data != NULL) {
+        char *line = strtok(data, "\n");
 
-    /* Initialize process->p with zeros. */
-    memset(&process->p, 0, sizeof(process->p));
-
-    while ((process->p = readproc(proc, NULL)) != NULL) {
-        process->cpu_usage = (process->p->utime + process->p->stime);
-
-        char buf[1024];
-        snprintf(buf, sizeof(buf), "PID: %d, Name: \"%s\", Status: '%c', CPU: %ld, Memory: %ld KB\n",
-            process->p->tid,
-            process->p->cmd,
-            process->p->state,
-            process->cpu_usage,
-            process->p->vm_size
-        );
-
-        printf("%s", buf);
-        //writetw((const char*)buf);
+        while (line != NULL) {
+            puts(line);
+            line = strtok(NULL, "\n");
+        } free(data);
     }
 
+    free(process);
     closeproc(proc);
+
     return EXIT_SUCCESS;
 }

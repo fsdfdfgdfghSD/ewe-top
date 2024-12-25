@@ -1,12 +1,15 @@
-TODO: Make your task manager, keep it simple like `top', call it `etop' which stands for `ewe-table-of-processes'
+TODO: Make your "table of processes", keep it simple like `top', call it `etop' which stands for `ewe-table-of-processes'
 
 Need to display the following info:
-1. Name -> FINISHED
-2. Status -> FINISHED
-3. PID -> FINISHED!
-4. CPU
-5. Memory
-6. Disk
-7. Network
+1. PID
+2. CMD
+3. USER (p->uid, and use getpwuid(p->uid) to convert it to a user)
+4. CPU Usage
+5. MEM Usage
+6. Status (S, R, Z...)
+7. Power Usage (Super Low, Low, Moderate, High, Super High) -> with colors, use ncurses
 
-8. Power Usage (Super Low, Low, Moderate, High, Super High) -> with colors, use ncurses
+> NOTE: Keep it very modular, write the functions to get the process information in top.h / top.c,
+and clear out main.c, remove main.h, keep main.c only for initalizing the ncurses window and writting the fetched information to it.
+
+> NOTE: Don't include searching/sorting, filtering, but have a terminate/kill process, kill(pid_t pid, int sig); 
