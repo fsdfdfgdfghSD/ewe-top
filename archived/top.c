@@ -36,21 +36,22 @@ PROCTAB *safe_create__proc(void)
 void fetch_proc_data(process_t *process, char *buf, size_t bytes_write)
 {
     /* TODO: Add Power-Usage, similar to windows */
-    /* TODO: Rearrange the information in a better way (for unix) */
-
-    const char *fmt = "User: %s\tName: %s\tStatus: %c\tPID: %d\tCPU: %%%ld\tMEM: %ld KB";
+    /* TODO: Rearrange the information in a better way (for unix), and get more information */
+   
+    /* TODO: Convert cpu to 0.1, 0.2, decimal basically */
+    const char *fmt = "%-10s %-6d %-20s %-6c %-6d %-10ld";
 
     /* Porcess start time + Kernel time */
     process->cpu_usage = (process->p->utime + process->p->stime);
     process->uid_user = uid_to_str(process->p->euid);
 
     (void)snprintf(buf, bytes_write, fmt,
-        process->uid_user,      /* UID (User) */
-        process->p->cmd,        /* Name */
-        process->p->state,      /* Status e.g. 'R', 'S', etc */
-        process->p->tid,        /* PID */
-        process->cpu_usage,     /* CPU */
-        process->p->vm_size     /* MEM (KB) */
+        process->uid_user,              /* UID (User) */
+        process->p->tid,                /* PID */
+        process->p->cmd,                /* CMD */
+        process->p->state,              /* Status, e.g. 'S', 'R' */
+        process->cpu_usage,             /* CPU */
+        process->p->vm_size / 1024      /* MEM (MB) */
     );
 }
 

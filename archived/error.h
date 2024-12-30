@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <string.h>
 
-#define EXIT_CODE -1
+#define EXIT_CODE EXIT_FAILURE
 #define ERROR_MSG_MAX 256
 
 /* Outputs the error to stderr and exits with `-1' */

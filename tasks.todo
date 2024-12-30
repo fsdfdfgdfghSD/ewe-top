@@ -1,15 +1,22 @@
 TODO: Make your "table of processes", keep it simple like `top', call it `etop' which stands for `ewe-table-of-processes'
 
 Need to display the following info:
-1. PID
-2. CMD
-3. USER (p->uid, and use getpwuid(p->uid) to convert it to a user)
-4. CPU Usage
-5. MEM Usage
-6. Status (S, R, Z...)
-7. Power Usage (Super Low, Low, Moderate, High, Super High) -> with colors, use ncurses
+1. PID -> DONE
+2. CMD -> DONE
+3. USER (uid) -> DONE
+4. CPU Usage -> DONE
+5. MEM Usage -> DONE
+6. Status (S, R, Z...) -> DONE
+7. Power Usage (Super Low, Low, Moderate, High, Super High, use colors as well) -> ...
 
-> NOTE: Keep it very modular, write the functions to get the process information in top.h / top.c,
-and clear out main.c, remove main.h, keep main.c only for initalizing the ncurses window and writting the fetched information to it.
+> NOTE: Don't include searching/sorting, filtering, but have a terminate/kill process, or be able to use a signal on a specific pid. Using inputs and https://luaposix.github.io/luaposix/modules/posix.signal.html#signal
 
-> NOTE: Don't include searching/sorting, filtering, but have a terminate/kill process, kill(pid_t pid, int sig); 
+> We're gonna have some options obviously.
+
+-h, --help: help info
+-v, --version: version information
+-d, --delay amount of time to wait to refresh
+
+> We're gonna use the Lua C API to write bindings of procfs for Lua, and some bindings of getopt_long for Lua.
+
+- For getopt_long bindings, see this to make sure it's fine https://github.com/cheusov/lua-alt-getopt
