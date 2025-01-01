@@ -10,6 +10,7 @@ local curses = require("curses")
 
 local cerror = require("include.error")
 local constants = require("include.constants")
+local lproc = require("include.proc.lproc")
 
 local win = {}
 win.__index = win
@@ -19,12 +20,9 @@ function win.new()
         stdscr = curses.initscr(),
 
         content = {},
-        processes = {},
 
         visible_start = 1,
-        visible_count = curses.lines(),
-
-        current_time = os.time()
+        visible_count = curses.lines()
     }, win)
 
     self:_init_win()
@@ -33,6 +31,7 @@ end
 
 function win:_init_win()
     self.stdscr:keypad  (true)    --> enable key padding support
+    self.stdscr:nodelay (true)    --> disable block during read
     curses.raw          (true)    --> see: <https://en.wikipedia.org/wiki/Terminal_mode>
     curses.echo         (false)   --> dont echo any characters
     curses.curs_set     (0)       --> `0' hides the cursor
@@ -88,15 +87,7 @@ function win:end_session(e)
     end)
 end
 
-local lproc = require("include.proc.lproc")
-
 function win:display_processes()
-    --[[ FIXME:
-        Dunno if that's a "good" way to keep track of the pids,
-        *I think* it can be optimized.
-    ]]
-
-    local active_pids = {}
     local new_content = {}
 
     for _, proc in ipairs(lproc()) do
@@ -109,31 +100,7 @@ function win:display_processes()
             proc.cmd
         )
 
-        if not self.processes[proc.pid] then
-            table.insert(new_content, fmt)
-            self.processes[proc.pid] = true
-        else
-            table.insert(new_content, fmt)
-        end
-
-        active_pids[proc.pid] = true
-    end
-
-    for pid in pairs(self.processes) do
-        if not active_pids[pid] then
-            -- Remove dead processes
-
-            for i = 1, #new_content do
-                if new_content[j]:find(tostring(pid)) then
-                    table.remove(new_content, j)
-                    break
-                end
-
-                -- Happy new year! (01/01/2025 - 02:43 AM)
-            end
-        end
-
-        self.processes[pid] = nil
+        table.insert(new_content, fmt)
     end
 
     self.content = new_content
@@ -143,9 +110,12 @@ end
 function win:start()
     self:display_processes()
 
+    local last_refresh = os.time()
+    local refresh_interval = 3
+
     while true do
         local ch = self.stdscr:getch()
-        
+
         if ch then
             if ch == constants.EXIT_KEY then
                 self.stdscr:endwin()
@@ -162,11 +132,10 @@ function win:start()
             end
         end
 
-        -- Refreshing logic
-        if self.current_time - os.clock() >= 3 then
+        if last_refresh - os.clock() >= refresh_interval then
             self:display_processes()
+            last_refresh = os.time()
         end
-        -------------------
     end
 end
 
