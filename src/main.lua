@@ -1,13 +1,9 @@
-local win = require("include.win")
 local jit = require("jit")
-
-local window = win.new()
-for i = 1, 50 do
-    window:write("Line: " .. i)
-end
+local window = require("include.win").new()
 
 local function main()
     local ok, status = pcall(function() window:start() end)
+
     if not ok then
         window:end_session(status)
     end

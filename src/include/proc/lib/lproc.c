@@ -81,20 +81,18 @@ static int l_readproc(lua_State *L)
     lua_pushstring(L, uid_to_str(L, p->euid));
     lua_settable(L, -3);
 
-    lua_pushstring(L, "state");
-    lua_pushstring(L, &p->state);
-    lua_settable(L, -3);
-
     /* CPU usage calculation */
-
     lua_pushstring(L, "cpu");
-    lua_pushnumber(L, 0);
+    lua_pushnumber(L, 0.0);
     lua_settable(L, -3);
 
     /* Memory usage calculation */
-
     lua_pushstring(L, "mem");
-    lua_pushnumber(L, 0);
+    lua_pushnumber(L, 0.0);
+    lua_settable(L, -3);
+
+    lua_pushstring(L, "state");
+    lua_pushstring(L, &p->state);
     lua_settable(L, -3);
 
     free(p);
@@ -111,7 +109,7 @@ static int l_closeproc(lua_State *L)
     return 0;
 }
 
-LUALIB_API int luaopen_lib_lproc(lua_State *L)
+LUALIB_API int luaopen_include_proc_lib_lproc_lib(lua_State *L)
 {
     struct luaL_Reg lproc_lib[] = {
         {"openproc",    l_openproc  },

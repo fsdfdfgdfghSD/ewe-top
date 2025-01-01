@@ -1,6 +1,6 @@
 -- TODO: Get the power-usage, based of mem and cpu.
 
-local lproc = require("lib.lproc")
+local lproc = require("include.proc.lib.lproc_lib")
 local bit
 
 if _VERSION == "Lua 5.1" then

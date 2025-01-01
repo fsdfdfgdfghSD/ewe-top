@@ -19,10 +19,12 @@ function win.new()
         stdscr = curses.initscr(),
 
         content = {},
+        processes = {},
+
         visible_start = 1,
         visible_count = curses.lines(),
 
-        selected_line = nil
+        current_time = os.time()
     }, win)
 
     self:_init_win()
@@ -86,33 +88,85 @@ function win:end_session(e)
     end)
 end
 
-function win:start()
+local lproc = require("include.proc.lproc")
+
+function win:display_processes()
+    --[[ FIXME:
+        Dunno if that's a "good" way to keep track of the pids,
+        *I think* it can be optimized.
+    ]]
+
+    local active_pids = {}
+    local new_content = {}
+
+    for _, proc in ipairs(lproc()) do
+        local fmt = ("%d\t%-20s\t%-1s\t%d\t%d\t%s"):format(
+            proc.pid,
+            proc.user,
+            proc.state,
+            proc.cpu,
+            proc.mem,
+            proc.cmd
+        )
+
+        if not self.processes[proc.pid] then
+            table.insert(new_content, fmt)
+            self.processes[proc.pid] = true
+        else
+            table.insert(new_content, fmt)
+        end
+
+        active_pids[proc.pid] = true
+    end
+
+    for pid in pairs(self.processes) do
+        if not active_pids[pid] then
+            -- Remove dead processes
+
+            for i = 1, #new_content do
+                if new_content[j]:find(tostring(pid)) then
+                    table.remove(new_content, j)
+                    break
+                end
+
+                -- Happy new year! (01/01/2025 - 02:43 AM)
+            end
+        end
+
+        self.processes[pid] = nil
+    end
+
+    self.content = new_content
     self:redraw()
+end
+
+function win:start()
+    self:display_processes()
 
     while true do
         local ch = self.stdscr:getch()
-
+        
         if ch then
             if ch == constants.EXIT_KEY then
-                self.stdscr:endwin(); break
+                self.stdscr:endwin()
+                break
             elseif ch == curses.KEY_F10 then
-                self.stdscr:endwin(); break
-
-            --- * ---------------- * ---
+                self.stdscr:endwin()
+                break
 
             -- Scrolling...
             elseif ch == curses.KEY_UP then
                 self:scroll_up()
             elseif ch == curses.KEY_DOWN then
                 self:scroll_down()
-            elseif ch == curses.KEY_F9 then
-                -- ...
             end
-        else
-            self:end_session("Non existent *key* or invalid *key*")
         end
 
-        self.stdscr:refresh()
+        -- Refreshing logic
+        if self.current_time - os.clock() >= 3 then
+            self:display_processes()
+        end
+        -------------------
     end
 end
 
